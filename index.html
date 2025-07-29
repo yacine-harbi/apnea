@@ -35,6 +35,13 @@
             font-size: 2.5rem;
         }
         
+        h1 .lungs-fallback {
+            height: 1.2em;
+            width: auto;
+            vertical-align: baseline;
+            margin-right: 0.2em;
+        }
+        
         .input-section {
             margin-bottom: 30px;
             padding: 20px;
@@ -196,7 +203,7 @@
 </head>
 <body>
     <div class="container">
-        <h1>🫁 Static Apnea Tracker</h1>
+        <h1 id="pageTitle">🫁 Static Apnea Tracker</h1>
         
         <div class="input-section">
             <h3>Edit Apnea Data</h3>
@@ -662,8 +669,55 @@
             updateDebugInfo([]);
         }
 
+        // Function to detect emoji support
+        function supportsEmoji(emoji) {
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = 32;
+            canvas.height = 32;
+            
+            // Set font properties
+            ctx.fillStyle = '#000';
+            ctx.font = '20px serif';
+            ctx.textBaseline = 'middle';
+            
+            // Draw the emoji
+            ctx.fillText(emoji, 16, 16);
+            
+            // Get image data
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+            
+            // Check if any pixels are non-transparent (emoji rendered)
+            for (let i = 3; i < imageData.data.length; i += 4) {
+                if (imageData.data[i] !== 0) {
+                    return true;
+                }
+            }
+            
+            return false;
+        }
+        
+        // Function to setup emoji fallback
+        function setupEmojiTitle() {
+            const titleElement = document.getElementById('pageTitle');
+            const lungsEmoji = '🫁';
+            
+            if (supportsEmoji(lungsEmoji)) {
+                // Emoji is supported, keep the current content
+                titleElement.innerHTML = '🫁 Static Apnea Tracker';
+            } else {
+                // Emoji not supported, use image fallback
+                titleElement.innerHTML = '<img src="lungs-google.png" alt="Lungs" class="lungs-fallback"> Static Apnea Tracker';
+            }
+        }
+
         // Initialize with default data or auto-refresh from Google Docs
         window.onload = function() {
+            // Setup emoji fallback first
+            setupEmojiTitle();
+            
             const savedUrl = loadGoogleDocsUrl();
             if (savedUrl) {
                 // Auto-refresh from saved Google Docs URL
