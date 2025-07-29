@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Apnea Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #f8f9fa;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 30px;
+            font-size: 2.5rem;
+        }
+        
+        .input-section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+        
+        .input-section h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        .input-section p {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        #dataInput {
+            width: 100%;
+            height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        #dataInput:focus {
+            outline: none;
+            border-color: #3b82f6;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #3b82f6;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2563eb;
+            transform: translateY(-1px);
+        }
+        
+        .btn-danger {
+            background-color: #ef4444;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #dc2626;
+            transform: translateY(-1px);
+        }
+        
+        .debug-info {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+        
+        .chart-container {
+            margin-top: 30px;
+            height: 500px;
+            position: relative;
+        }
+        
+        .stats {
+            margin-top: 20px;
+            text-align: center;
+            padding: 15px;
+            background: #f1f5f9;
+            border-radius: 6px;
+        }
+        
+        .stats p {
+            margin: 5px 0;
+            color: #475569;
+        }
+        
+        .stats .highlight {
+            font-weight: bold;
+            color: #1e40af;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🫁 Static Apnea Tracker</h1>
+        
+        <div class="input-section">
+            <h3>Edit Apnea Data</h3>
+            <p>Format: Date (DD/MM/YYYY) followed by times in seconds with " (e.g., 60")</p>
+            
+            <textarea id="dataInput" placeholder="Enter your apnea data here...">27/07/2025
+70"
+66"
+26/07/2025
+75"
+25/07/2025
+39"
+75"
+75"
+24/07/2025
+68"
+68"
+52"
+23/07/2025
+35"
+60"
+60"
+22/07/2025
+60"
+45"
+90"
+21/07/2025
+60"
+26"
+60"</textarea>
+            
+            <div class="button-group">
+                <button class="btn btn-primary" onclick="parseData()">📊 Parse Data</button>
+                <button class="btn btn-danger" onclick="clearData()">🗑️ Clear All</button>
+            </div>
+            
+            <div id="debugInfo" class="debug-info"></div>
+        </div>
+        
+        <div class="chart-container">
+            <canvas id="apneaChart"></canvas>
+        </div>
+        
+        <div id="stats" class="stats"></div>
+    </div>
+
+    <script>
+        let chart = null;
+        let parsedData = [];
+
+        // Parser function
+        function parseApneaData(input) {
+            const lines = input.trim().split('\n');
+            const parsed = [];
+            let currentDate = '';
+            let dayIndex = 0;
+            const dateMap = new Map();
+
+            for (let line of lines) {
+                line = line.trim();
+                if (!line) continue;
+
+                // Check if line is a date
+                if (line.match(/\d{1,2}\/\d{1,2}\/\d{4}/)) {
+                    currentDate = line.substring(0, 5); // Get DD/MM part
+                    if (!dateMap.has(currentDate)) {
+                        dateMap.set(currentDate, dayIndex++);
+                    }
+                } else if (line.includes('"') && currentDate) {
+                    // Parse time measurement
+                    const timeMatch = line.match(/(\d+)"/);
+                    if (timeMatch) {
+                        const time = parseInt(timeMatch[1]);
+                        if (!isNaN(time)) {
+                            const measurementCount = parsed.filter(p => p.date === currentDate).length + 1;
+                            parsed.push({
+                                date: currentDate,
+                                measurement: measurementCount,
+                                time: time,
+                                label: `${currentDate} - #${measurementCount}`,
+                                dayIndex: dateMap.get(currentDate)
+                            });
+                        }
+                    }
+                }
+            }
+
+            // Sort by date then by measurement number
+            return parsed.sort((a, b) => {
+                if (a.dayIndex !== b.dayIndex) {
+                    return a.dayIndex - b.dayIndex;
+                }
+                return a.measurement - b.measurement;
+            });
+        }
+
+        // Calculate cumulative average
+        function calculateCumulativeAverage(data) {
+            return data.map((point, index) => {
+                const timesToDate = data.slice(0, index + 1).map(p => p.time);
+                const averageToDate = timesToDate.reduce((sum, time) => sum + time, 0) / timesToDate.length;
+                return {
+                    ...point,
+                    averageToDate: Math.round(averageToDate * 100) / 100
+                };
+            });
+        }
+
+        // Create or update chart
+        function updateChart(data) {
+            const ctx = document.getElementById('apneaChart').getContext('2d');
+            
+            if (chart) {
+                chart.destroy();
+            }
+
+            const chartData = calculateCumulativeAverage(data);
+            
+            chart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: chartData.map(d => d.label),
+                    datasets: [
+                        {
+                            label: 'Apnea Time',
+                            data: chartData.map(d => d.time),
+                            backgroundColor: '#3b82f6',
+                            borderColor: '#1e40af',
+                            borderWidth: 1,
+                            maxBarThickness: 25
+                        },
+                        {
+                            label: 'Cumulative Average',
+                            data: chartData.map(d => d.averageToDate),
+                            type: 'line',
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 3,
+                            borderDash: [5, 5],
+                            pointRadius: 0,
+                            tension: 0.1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        title: {
+                            display: true,
+                            text: 'Static Apnea Times (seconds)',
+                            font: {
+                                size: 18,
+                                weight: 'bold'
+                            }
+                        },
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    if (context.datasetIndex === 0) {
+                                        return `Apnea Time: ${context.parsed.y} seconds`;
+                                    } else {
+                                        return `Cumulative Average: ${context.parsed.y} seconds`;
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                maxRotation: 45,
+                                minRotation: 45,
+                                font: {
+                                    size: 10
+                                }
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Time (seconds)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update stats display
+        function updateStats(data) {
+            const statsDiv = document.getElementById('stats');
+            
+            if (data.length === 0) {
+                statsDiv.innerHTML = '<p>No data to display</p>';
+                return;
+            }
+
+            const chartData = calculateCumulativeAverage(data);
+            const currentAverage = chartData[chartData.length - 1]?.averageToDate || 0;
+            const maxTime = Math.max(...data.map(d => d.time));
+            const minTime = Math.min(...data.map(d => d.time));
+            const uniqueDays = new Set(data.map(d => d.date)).size;
+
+            statsDiv.innerHTML = `
+                <p>Current cumulative average: <span class="highlight">${Math.round(currentAverage)} seconds</span></p>
+                <p>Total attempts: <span class="highlight">${data.length}</span> | Days tracked: <span class="highlight">${uniqueDays}</span></p>
+                <p>Best time: <span class="highlight">${maxTime} seconds</span> | Shortest time: <span class="highlight">${minTime} seconds</span></p>
+            `;
+        }
+
+        // Update debug info
+        function updateDebugInfo(data) {
+            const debugDiv = document.getElementById('debugInfo');
+            const uniqueDays = new Set(data.map(d => d.date)).size;
+            debugDiv.textContent = `Parsed ${data.length} measurements from ${uniqueDays} days`;
+        }
+
+        // Parse data button handler
+        function parseData() {
+            const input = document.getElementById('dataInput').value;
+            parsedData = parseApneaData(input);
+            updateChart(parsedData);
+            updateStats(parsedData);
+            updateDebugInfo(parsedData);
+        }
+
+        // Clear data button handler
+        function clearData() {
+            document.getElementById('dataInput').value = '';
+            parsedData = [];
+            if (chart) {
+                chart.destroy();
+                chart = null;
+            }
+            updateStats([]);
+            updateDebugInfo([]);
+        }
+
+        // Initialize with default data
+        window.onload = function() {
+            parseData();
+        };
+    </script>
+</body>
+</html>
