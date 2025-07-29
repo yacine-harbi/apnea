@@ -482,7 +482,7 @@
                     }
                 } else if (line.match(/^\d+/) && currentDate) {
                     // Parse time measurement - supports multiple formats
-                    const timeMatch = line.match(/(\d+)\s*[""""]?\s*$/);
+                    const timeMatch = line.match(/(\d+)\s*[”"“]?\s*$/);
                     if (timeMatch) {
                         const time = parseInt(timeMatch[1]);
                         if (!isNaN(time)) {
