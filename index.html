@@ -145,7 +145,7 @@
         
         <div class="input-section">
             <h3>Edit Apnea Data</h3>
-            <p>Format: Date (DD/MM/YYYY) followed by times in seconds with " (e.g., 60")</p>
+            <p>Format: Date (DD/MM/YYYY) followed by times in seconds. Supports: 60", 60", 60 ", 60 ", or 60</p>
             
             <textarea id="dataInput" placeholder="Enter your apnea data here...">27/07/2025
 70"
@@ -210,9 +210,9 @@
                     if (!dateMap.has(currentDate)) {
                         dateMap.set(currentDate, dayIndex++);
                     }
-                } else if (line.includes('"') && currentDate) {
-                    // Parse time measurement
-                    const timeMatch = line.match(/(\d+)"/);
+                } else if (line.match(/^\d+/) && currentDate) {
+                    // Parse time measurement - supports multiple formats
+                    const timeMatch = line.match(/(\d+)\s*[""""]?\s*$/);
                     if (timeMatch) {
                         const time = parseInt(timeMatch[1]);
                         if (!isNaN(time)) {
