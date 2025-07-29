@@ -495,8 +495,7 @@
             const lines = input.trim().split('\n');
             const parsed = [];
             let currentDate = '';
-            let dayIndex = 0;
-            const dateMap = new Map();
+            let currentFullDate = '';
 
             for (let line of lines) {
                 line = line.trim();
@@ -505,9 +504,7 @@
                 // Check if line is a date
                 if (line.match(/\d{1,2}\/\d{1,2}\/\d{4}/)) {
                     currentDate = line.substring(0, 5); // Get DD/MM part
-                    if (!dateMap.has(currentDate)) {
-                        dateMap.set(currentDate, dayIndex++);
-                    }
+                    currentFullDate = line; // Keep full date for sorting
                 } else if (line.match(/^\d+/) && currentDate) {
                     // Parse time measurement - supports multiple formats
                     const timeMatch = line.match(/(\d+)\s*[”"“]?\s*$/);
@@ -517,22 +514,31 @@
                             const measurementCount = parsed.filter(p => p.date === currentDate).length + 1;
                             parsed.push({
                                 date: currentDate,
+                                fullDate: currentFullDate,
                                 measurement: measurementCount,
                                 time: time,
-                                label: `${currentDate} - #${measurementCount}`,
-                                dayIndex: dateMap.get(currentDate)
+                                label: `${currentDate} - #${measurementCount}`
                             });
                         }
                     }
                 }
             }
 
-            // Sort by date then by measurement number
+            // Sort by date chronologically, then by measurement number
             return parsed.sort((a, b) => {
-                if (a.dayIndex !== b.dayIndex) {
-                    return a.dayIndex - b.dayIndex;
+                // Parse dates for chronological comparison (DD/MM/YYYY)
+                const parseDate = (dateStr) => {
+                    const [day, month, year] = dateStr.split('/');
+                    return new Date(year, month - 1, day); // month is 0-indexed in Date constructor
+                };
+
+                const dateA = parseDate(a.fullDate);
+                const dateB = parseDate(b.fullDate);
+
+                if (dateA.getTime() !== dateB.getTime()) {
+                    return dateA.getTime() - dateB.getTime(); // Sort by date ascending
                 }
-                return a.measurement - b.measurement;
+                return a.measurement - b.measurement; // Then by measurement number
             });
         }
 
