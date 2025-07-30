@@ -351,27 +351,6 @@
         // Fetch data from Google Docs
         async function fetchGoogleDocsData(url) {
             try {
-                // Try multiple CORS proxy services
-                const proxies = [
-                    `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-                    `https://cors-anywhere.herokuapp.com/${url}`,
-                    `https://api.codetabs.com/v1/proxy?quest=${encodeURIComponent(url)}`
-                ];
-
-                for (const proxyUrl of proxies) {
-                    try {
-                        const response = await fetch(proxyUrl);
-                        if (response.ok) {
-                            const data = await response.json();
-                            return data.contents || data;
-                        }
-                    } catch (proxyError) {
-                        console.log(`Proxy ${proxyUrl} failed:`, proxyError);
-                        continue;
-                    }
-                }
-
-                // Fallback: try direct fetch (may fail due to CORS)
                 const response = await fetch(url);
                 if (!response.ok) {
                     throw new Error(`Failed to fetch document: ${response.status} ${response.statusText}`);
