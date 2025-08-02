@@ -740,6 +740,14 @@
                 // Move Google Docs tab to the beginning
                 tabsList.prepend(googleDocsTab);
 
+                const tabsContentList = document.getElementById('dataInputTabsContent');
+                const googleDocsTabContent = document.querySelector('#google-docs');
+                
+                // Move Google Docs tab to the beginning
+                tabsContentList.prepend(googleDocsTabContent);
+                
+                
+
                 
                 // Auto-refresh from saved Google Docs URL
                 autoRefreshFromGoogleDocs();                
