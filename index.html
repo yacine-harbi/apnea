@@ -739,13 +739,19 @@
                 
                 // Move Google Docs tab to the beginning
                 tabsList.prepend(googleDocsTab);
-
-                const tabsContentList = document.getElementById('dataInputTabsContent');
-                const googleDocsTabContent = document.querySelector('#google-docs');
+            
+                const googleDocsTab = document.getElementById('google-docs-tab');
+                const manualInputTab = document.getElementById('manual-input-tab');
                 
-                // Move Google Docs tab to the beginning
-                tabsContentList.prepend(googleDocsTabContent);
+               // Remove active state from Manual Input
+                manualInputTab.classList.remove('active');
+                manualInputTab.setAttribute('aria-selected', 'false');
+                manualInputTab.setAttribute('tabindex', '-1');
                 
+                // Add active state to Google Docs
+                googleDocsTab.classList.add('active');
+                googleDocsTab.setAttribute('aria-selected', 'true');
+                googleDocsTab.removeAttribute('tabindex');     
                 
 
                 
