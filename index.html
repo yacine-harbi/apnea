@@ -723,6 +723,38 @@
             }
         }
 
+        // Function to reorder tabs based on whether there's a saved Google Docs URL
+        function reorderTabsBasedOnSavedUrl() {
+            const savedUrl = loadGoogleDocsUrl();
+            
+            if (savedUrl) {
+                // If there's a saved URL, make Google Docs tab first and active
+                const tabsContainer = document.getElementById('dataInputTabs');
+                const manualTab = document.getElementById('manual-input-tab').parentElement;
+                const googleDocsTab = document.getElementById('google-docs-tab').parentElement;
+                
+                // Reorder tabs: Google Docs first, Manual Input second
+                tabsContainer.insertBefore(googleDocsTab, manualTab);
+                
+                // Set Google Docs tab as active
+                document.getElementById('manual-input-tab').classList.remove('active');
+                document.getElementById('manual-input-tab').setAttribute('aria-selected', 'false');
+                document.getElementById('google-docs-tab').classList.add('active');
+                document.getElementById('google-docs-tab').setAttribute('aria-selected', 'true');
+                
+                // Set Google Docs content as active and manual content as hidden
+                const manualContent = document.getElementById('manual-input');
+                const googleDocsContent = document.getElementById('google-docs');
+                
+                manualContent.classList.remove('show', 'active');
+                manualContent.style.display = 'none'; // Explicitly hide manual content
+                
+                googleDocsContent.classList.add('show', 'active');
+                googleDocsContent.style.display = 'block'; // Explicitly show Google Docs content
+            }
+            // If no saved URL, keep the current order (Manual Input first and active)
+        }
+
         // Initialize with default data or auto-refresh from Google Docs
         window.onload = function() {
             // Setup emoji fallback first
@@ -730,6 +762,9 @@
             
             // Initialize Bootstrap tabs fallback (in case Bootstrap JS doesn't load)
             initializeTabFallback();
+            
+            // Reorder tabs based on saved URL before doing anything else
+            reorderTabsBasedOnSavedUrl();
             
             const savedUrl = loadGoogleDocsUrl();
             if (savedUrl) {
