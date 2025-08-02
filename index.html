@@ -736,13 +736,11 @@
                 // Make Google tab first
                 const tabsList = document.getElementById('dataInputTabs');
                 const googleDocsTab = document.querySelector('#dataInputTabs li #google-docs-tab');
+                const manualInputTab = document.getElementById('manual-input-tab');
                 
                 // Move Google Docs tab to the beginning
                 tabsList.prepend(googleDocsTab);
-            
-                const googleDocsTab = document.getElementById('google-docs-tab');
-                const manualInputTab = document.getElementById('manual-input-tab');
-                
+                            
                // Remove active state from Manual Input
                 manualInputTab.classList.remove('active');
                 manualInputTab.setAttribute('aria-selected', 'false');
@@ -753,7 +751,6 @@
                 googleDocsTab.setAttribute('aria-selected', 'true');
                 googleDocsTab.removeAttribute('tabindex');     
                 
-
                 
                 // Auto-refresh from saved Google Docs URL
                 autoRefreshFromGoogleDocs();                
