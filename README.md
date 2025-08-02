@@ -1,42 +1,27 @@
-# Apnea App Documentation
+# Apnea
 
-## Overview
-This application is designed to assist users in tracking their apnea activities through various functionalities. Below is a comprehensive documentation of all the features available in the application.
+This is a vibecoded app using Claude Sonnet 4.
 
-### Features
+## Live App
 
-1. **Static Apnea Tracking**  
-   The app allows users to track their static apnea sessions, providing insights into their performance over time.
+You can access the live app at [https://yacine-harbi.com/apnea/](https://yacine-harbi.com/apnea/)
 
-2. **Manual Data Input**  
-   Users can manually input their apnea data, ensuring that all sessions can be logged accurately.
+## Description
 
-3. **Google Docs Integration**  
-   The app supports integration with Google Docs, allowing users to export their data for further analysis or sharing.
+Add your project description here.
 
-4. **Interactive Charts with Chart.js**  
-   Visualization of data is made easy with interactive charts powered by Chart.js, enabling users to view their progress visually.
+## Installation
 
-5. **Detailed Statistics Calculation**  
-   The application calculates detailed statistics from the input data, helping users understand their performance metrics.
+Add installation instructions here.
 
-6. **Cumulative Average Tracking**  
-   Users can track their cumulative averages over time, giving them a clear view of their progress.
+## Usage
 
-7. **Flexible Data Parsing**  
-   The app features flexible data parsing capabilities, accommodating various data formats for input.
+Add usage instructions here.
 
-8. **Visual Progress Tracking**  
-   Visual indicators are provided to help users see their progress at a glance.
+## Contributing
 
-9. **Responsive Design**  
-   The application is built with a responsive design, ensuring usability across different devices.
+Add contribution guidelines here.
 
-10. **Data Export/Import Capabilities**  
-    Users can easily export and import their data, making it convenient to back up or share their information.
+## License
 
-11. **No-Login/No-Backend Architecture**  
-    The app is designed to function without requiring user login or a backend, ensuring a seamless experience for users.
-
-## Conclusion
-This documentation summarizes the functionalities available in the Apnea app. Users are encouraged to explore each feature to maximize their experience and performance tracking.
+Add license information here.
