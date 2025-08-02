@@ -733,8 +733,8 @@
             
             const savedUrl = loadGoogleDocsUrl();
             if (savedUrl) {
-
-             // 1. Reorder the tab buttons
+                // Make Google tab first
+                // 1. Reorder the tab buttons
                 const tabsList = document.getElementById('dataInputTabs');
                 const googleDocsLi = document.getElementById('google-docs-tab').parentElement;
                 const manualInputLi = document.getElementById('manual-input-tab').parentElement;
@@ -753,26 +753,6 @@
                 const tab = new bootstrap.Tab(googleDocsTab);
                 tab.show();
 
-                /*
-                // Make Google tab first
-                const tabsList = document.getElementById('dataInputTabs');
-                const googleDocsTab = document.querySelector('#dataInputTabs li #google-docs-tab');
-                const manualInputTab = document.getElementById('manual-input-tab');
-                
-                // Move Google Docs tab to the beginning
-                tabsList.prepend(googleDocsTab);
-                            
-               // Remove active state from Manual Input
-                manualInputTab.classList.remove('active');
-                manualInputTab.setAttribute('aria-selected', 'false');
-                manualInputTab.setAttribute('tabindex', '-1');
-                
-                // Add active state to Google Docs
-                googleDocsTab.classList.add('active');
-                googleDocsTab.setAttribute('aria-selected', 'true');
-                googleDocsTab.removeAttribute('tabindex');     
-                */
-                
                 // Auto-refresh from saved Google Docs URL
                 autoRefreshFromGoogleDocs();                
             } else {
