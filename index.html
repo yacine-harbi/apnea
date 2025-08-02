@@ -733,8 +733,16 @@
             
             const savedUrl = loadGoogleDocsUrl();
             if (savedUrl) {
+                // Make Google tab first
+                const tabsList = document.getElementById('dataInputTabs');
+                const googleDocsTab = document.querySelector('#dataInputTabs li#google-docs-tab');
+                
+                // Move Google Docs tab to the beginning
+                tabsList.prepend(googleDocsTab);
+
+                
                 // Auto-refresh from saved Google Docs URL
-                autoRefreshFromGoogleDocs();
+                autoRefreshFromGoogleDocs();                
             } else {
                 // Initialize with default data
                 parseData();
