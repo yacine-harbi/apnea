@@ -1,0 +1,1 @@
+To hide and show tabs use bootstrap functions instead of manually manipulating the DOM classes and attributes.
