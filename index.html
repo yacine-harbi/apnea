@@ -736,23 +736,45 @@
                 // Reorder tabs: Google Docs first, Manual Input second
                 tabsContainer.insertBefore(googleDocsTab, manualTab);
                 
-                // Set Google Docs tab as active
-                document.getElementById('manual-input-tab').classList.remove('active');
-                document.getElementById('manual-input-tab').setAttribute('aria-selected', 'false');
-                document.getElementById('google-docs-tab').classList.add('active');
-                document.getElementById('google-docs-tab').setAttribute('aria-selected', 'true');
+                // Use Bootstrap Tab API to activate Google Docs tab
+                const googleDocsTabElement = document.getElementById('google-docs-tab');
                 
-                // Set Google Docs content as active and manual content as hidden
-                const manualContent = document.getElementById('manual-input');
-                const googleDocsContent = document.getElementById('google-docs');
-                
-                manualContent.classList.remove('show', 'active');
-                manualContent.style.display = 'none'; // Explicitly hide manual content
-                
-                googleDocsContent.classList.add('show', 'active');
-                googleDocsContent.style.display = 'block'; // Explicitly show Google Docs content
+                // Try to use Bootstrap Tab API if available
+                if (typeof bootstrap !== 'undefined' && bootstrap.Tab) {
+                    try {
+                        const googleDocsTabInstance = new bootstrap.Tab(googleDocsTabElement);
+                        googleDocsTabInstance.show();
+                    } catch (error) {
+                        console.warn('Bootstrap Tab API failed, falling back to manual method:', error);
+                        // Fallback to manual method if Bootstrap Tab API fails
+                        activateTabManually(googleDocsTabElement);
+                    }
+                } else {
+                    // Fallback to manual method if Bootstrap is not available
+                    activateTabManually(googleDocsTabElement);
+                }
             }
             // If no saved URL, keep the current order (Manual Input first and active)
+        }
+        
+        // Helper function for manual tab activation (fallback when Bootstrap is not available)
+        function activateTabManually(tabElement) {
+            const tabId = tabElement.getAttribute('data-bs-target').substring(1); // Remove #
+            const targetContent = document.getElementById(tabId);
+            
+            // Deactivate all tabs and content
+            document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+                tab.classList.remove('active');
+                tab.setAttribute('aria-selected', 'false');
+            });
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.classList.remove('show', 'active');
+            });
+            
+            // Activate the target tab and content
+            tabElement.classList.add('active');
+            tabElement.setAttribute('aria-selected', 'true');
+            targetContent.classList.add('show', 'active');
         }
 
         // Initialize with default data or auto-refresh from Google Docs
