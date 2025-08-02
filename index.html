@@ -211,7 +211,6 @@
         
         <div class="input-section">
             <h3>Edit Apnea Data</h3>
-            <p>Format: Date (DD/MM/YYYY) followed by times in seconds. Supports: 60", 60", 60 ", 60 ", or 60</p>
             
             <!-- Bootstrap Tabs Navigation -->
             <ul class="nav nav-tabs" id="dataInputTabs" role="tablist">
@@ -227,8 +226,8 @@
             <div class="tab-content" id="dataInputTabsContent">
                 <!-- Manual Input Tab -->
                 <div class="tab-pane fade show active" id="manual-input" role="tabpanel" aria-labelledby="manual-input-tab">
+                    <p>Format: Date (DD/MM/YYYY) followed by times in seconds. Supports: 60", 60", 60 ", 60 ", or 60</p>
                     <div class="manual-input-section">
-                        <h4>Manual Input</h4>
                         <textarea id="dataInput" placeholder="Enter your apnea data here...">27/07/2025
 70"
 66"
@@ -265,7 +264,6 @@
                 <!-- Google Docs Tab -->
                 <div class="tab-pane fade" id="google-docs" role="tabpanel" aria-labelledby="google-docs-tab">
                     <div class="google-docs-section">
-                        <h4>Load from Google Docs</h4>
                         <p>Enter a published Google Docs URL to automatically load your apnea data:</p>
                         <input type="url" id="googleDocsUrl" placeholder="https://docs.google.com/document/d/e/..." class="url-input">
                         <div class="button-group">
