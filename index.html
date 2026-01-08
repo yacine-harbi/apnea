@@ -264,8 +264,19 @@
                 <!-- Google Docs Tab -->
                 <div class="tab-pane fade" id="google-docs" role="tabpanel" aria-labelledby="google-docs-tab">
                     <div class="google-docs-section">
-                        <p>Enter a published Google Docs URL to automatically load your apnea data:</p>
-                        <input type="url" id="googleDocsUrl" placeholder="https://docs.google.com/document/d/e/..." class="url-input">
+                        <h4>Load from Google Docs</h4>
+                        <p>To use this feature:</p>
+                        <ol style="font-size: 0.9rem; color: #666; margin-bottom: 15px; padding-left: 20px;">
+                            <li>Open your Google Docs document</li>
+                            <li>Go to <strong>File → Share → Publish to the web</strong></li>
+                            <li>Click <strong>Publish</strong></li>
+                            <li>Copy the published URL (must contain <code>/pub</code>)</li>
+                            <li>Paste it below and click "Load from Google Docs"</li>
+                        </ol>
+                        <p style="font-size: 0.85rem; color: #888; margin-bottom: 10px;">
+                            Need help? See <a href="https://support.google.com/docs/answer/183965?hl=en&co=GENIE.Platform%3DDesktop" target="_blank" rel="noopener noreferrer">Google's guide on publishing to the web</a>
+                        </p>
+                        <input type="url" id="googleDocsUrl" placeholder="https://docs.google.com/document/d/e/.../pub" class="url-input">
                         <div class="button-group">
                             <button class="btn btn-primary" onclick="loadFromGoogleDocs()">📥 Load from Google Docs</button>
                             <button class="btn btn-danger" onclick="clearGoogleDocsUrl()">🗑️ Clear Google Docs Link</button>
@@ -372,7 +383,7 @@
 
             // Validate URL format
             if (!url.includes('docs.google.com') || !url.includes('/pub')) {
-                showStatus('Please enter a published Google Docs URL (must contain "/pub").', 'error');
+                showStatus('Please enter a published Google Docs URL (must contain "/pub"). Go to File → Share → Publish to the web in Google Docs.', 'error');
                 return;
             }
 
