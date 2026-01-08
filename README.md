@@ -18,7 +18,17 @@ This application is designed to assist users in tracking their apnea activities 
    Users can manually input their apnea data, ensuring that all sessions can be logged accurately.
 
 3. **Google Docs Integration**  
-   The app supports integration with Google Docs, allowing users to export their data for further analysis or sharing.
+   The app supports integration with Google Docs, allowing users to automatically load their apnea data from a published Google Docs document.
+   
+   **How to use Google Docs Integration:**
+   1. Create or open your Google Docs document containing your apnea data
+   2. Go to **File → Share → Publish to the web**
+   3. Click **Publish** (you can choose to publish the entire document or specific pages)
+   4. Copy the published URL (it should contain `/pub` in the path)
+   5. Paste the URL into the "Load from Google Docs" tab in the app
+   6. Click "Load from Google Docs" to import your data
+   
+   For more detailed instructions, see [Google's official guide on publishing to the web](https://support.google.com/docs/answer/183965?hl=en&co=GENIE.Platform%3DDesktop).
 
 4. **Interactive Charts with Chart.js**  
    Visualization of data is made easy with interactive charts powered by Chart.js, enabling users to view their progress visually.
