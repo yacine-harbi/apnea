@@ -53,3 +53,6 @@ This application is designed to assist users in tracking their apnea activities 
 
 11. **No-Login/No-Backend Architecture**  
     The app is designed to function without requiring user login or a backend, ensuring a seamless experience for users.
+
+12. **Built-in Stopwatch**
+    Time holds with Start, Stop / Pause, and Reset, or press Space outside form controls to start/pause. Start resumes a paused hold; Reset starts a new one. After stopping, **➕ Add to today** saves the rounded seconds under today's date in Manual Input and refreshes the chart and statistics. Results are not written back to Google Docs.
