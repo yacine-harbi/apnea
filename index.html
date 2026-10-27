@@ -62,6 +62,17 @@
             margin-bottom: 15px;
             font-size: 0.9rem;
         }
+
+        #stopwatchDisplay {
+            font-size: clamp(2.5rem, 12vw, 4rem);
+            font-variant-numeric: tabular-nums;
+            line-height: 1.2;
+        }
+
+        .stopwatch-controls {
+            flex-wrap: wrap;
+            justify-content: center;
+        }
         
 
         
@@ -208,6 +219,19 @@
 <body>
     <div class="container">
         <h1 id="pageTitle">🫁 Static Apnea Tracker</h1>
+
+        <section class="input-section text-center" aria-labelledby="stopwatchHeading">
+            <h3 id="stopwatchHeading">⏱️ Stopwatch</h3>
+            <div id="stopwatchDisplay" role="timer" aria-label="Elapsed time">00:00.0</div>
+            <div class="button-group stopwatch-controls">
+                <button type="button" id="stopwatchToggle" class="btn btn-primary" onclick="toggleStopwatch()">Start</button>
+                <button type="button" class="btn btn-secondary" onclick="resetStopwatch()">Reset</button>
+                <button type="button" id="stopwatchSave" class="btn btn-primary" onclick="saveStopwatch()" disabled>➕ Add to today</button>
+            </div>
+            <p class="mt-3 mb-0">Start resumes a paused hold. Press Space to start/pause outside form controls.</p>
+            <p class="mb-0">Results are added to Manual Input only, not written back to Google Docs.</p>
+            <div id="stopwatchStatus" class="debug-info" role="status"></div>
+        </section>
         
         <div class="input-section">
             <h3>Edit Apnea Data</h3>
@@ -299,6 +323,93 @@
     <script>
         let chart = null;
         let parsedData = [];
+
+        let stopwatchElapsed = 0;
+        let stopwatchStartedAt = null;
+        let stopwatchFrame = null;
+
+        function renderStopwatch() {
+            const elapsed = stopwatchElapsed + (stopwatchStartedAt === null ? 0 : performance.now() - stopwatchStartedAt);
+            const tenths = Math.floor(elapsed / 100);
+            const minutes = String(Math.floor(tenths / 600)).padStart(2, '0');
+            const seconds = String(Math.floor(tenths / 10) % 60).padStart(2, '0');
+            document.getElementById('stopwatchDisplay').textContent = `${minutes}:${seconds}.${tenths % 10}`;
+            if (stopwatchStartedAt !== null) {
+                stopwatchFrame = requestAnimationFrame(renderStopwatch);
+            }
+        }
+
+        function toggleStopwatch() {
+            const toggle = document.getElementById('stopwatchToggle');
+            const save = document.getElementById('stopwatchSave');
+            if (stopwatchStartedAt === null) {
+                stopwatchStartedAt = performance.now();
+                toggle.textContent = 'Stop / Pause';
+                toggle.classList.replace('btn-primary', 'btn-danger');
+                save.disabled = true;
+            } else {
+                stopwatchElapsed += performance.now() - stopwatchStartedAt;
+                stopwatchStartedAt = null;
+                cancelAnimationFrame(stopwatchFrame);
+                toggle.textContent = 'Start';
+                toggle.classList.replace('btn-danger', 'btn-primary');
+                save.disabled = Math.round(stopwatchElapsed / 1000) === 0;
+            }
+            document.getElementById('stopwatchStatus').textContent = '';
+            renderStopwatch();
+        }
+
+        function resetStopwatch() {
+            cancelAnimationFrame(stopwatchFrame);
+            stopwatchStartedAt = null;
+            stopwatchElapsed = 0;
+            const toggle = document.getElementById('stopwatchToggle');
+            toggle.textContent = 'Start';
+            toggle.classList.replace('btn-danger', 'btn-primary');
+            document.getElementById('stopwatchSave').disabled = true;
+            document.getElementById('stopwatchStatus').textContent = '';
+            renderStopwatch();
+        }
+
+        function saveStopwatch() {
+            const save = document.getElementById('stopwatchSave');
+            if (stopwatchStartedAt !== null || save.disabled) return;
+
+            const today = new Date();
+            const day = today.getDate();
+            const month = today.getMonth() + 1;
+            const year = today.getFullYear();
+            const date = `${String(day).padStart(2, '0')}/${String(month).padStart(2, '0')}/${year}`;
+            const time = `${Math.round(stopwatchElapsed / 1000)}"`;
+            const input = document.getElementById('dataInput');
+            const lines = input.value ? input.value.split(/\r?\n/) : [];
+            const datePattern = /^\d{1,2}\/\d{1,2}\/\d{4}$/;
+            const todayIndex = lines.findIndex(line => {
+                if (!datePattern.test(line.trim())) return false;
+                const parts = line.trim().split('/').map(Number);
+                return parts[0] === day && parts[1] === month && parts[2] === year;
+            });
+
+            if (todayIndex === -1) {
+                lines.unshift(date, time);
+            } else {
+                let end = todayIndex + 1;
+                while (end < lines.length && !datePattern.test(lines[end].trim())) end++;
+                while (end > todayIndex + 1 && !lines[end - 1].trim()) end--;
+                lines.splice(end, 0, time);
+            }
+            input.value = lines.join('\n');
+            parseData();
+            save.disabled = true;
+            document.getElementById('stopwatchStatus').textContent = `Added ${time} to ${date} in Manual Input. Google Docs is unchanged.`;
+        }
+
+        document.addEventListener('keydown', function(event) {
+            if (event.code !== 'Space' || event.target.isContentEditable ||
+                event.target.closest('input, textarea, select, button, a')) return;
+            event.preventDefault();
+            if (!event.repeat) toggleStopwatch();
+        });
 
         // Google Docs Integration Functions
         const GOOGLE_DOCS_URL_KEY = 'apnea_google_docs_url';
